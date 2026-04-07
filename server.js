@@ -12,6 +12,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.post('/api/ai-move', (req, res) => {
   try {
     const { board } = req.body;
+
+    if (!Array.isArray(board)) {
+      return res.status(400).json({ error: 'board must be an array' });
+    }
+    if (board.length !== 9) {
+      return res.status(400).json({ error: 'board must have exactly 9 cells' });
+    }
+    const validValues = [null, 'X', 'O'];
+    for (let i = 0; i < board.length; i++) {
+      if (!validValues.includes(board[i])) {
+        return res.status(400).json({ error: `Invalid cell value at index ${i}: must be null, "X", or "O"` });
+      }
+    }
+
     const move = getBestMove(board);
     if (move !== null) {
       res.json({ move });
@@ -27,6 +41,27 @@ app.post('/api/ai-move', (req, res) => {
 app.post('/api/games', async (req, res) => {
   try {
     const { result, moves } = req.body;
+
+    const validResults = ['X', 'O', 'draw'];
+    if (!validResults.includes(result)) {
+      return res.status(400).json({ error: 'result must be "X", "O", or "draw"' });
+    }
+    if (!Array.isArray(moves)) {
+      return res.status(400).json({ error: 'moves must be an array' });
+    }
+    for (let i = 0; i < moves.length; i++) {
+      const move = moves[i];
+      if (!move || typeof move !== 'object') {
+        return res.status(400).json({ error: `Invalid move at index ${i}: must be an object` });
+      }
+      if (!['X', 'O'].includes(move.player)) {
+        return res.status(400).json({ error: `Invalid player at move index ${i}: must be "X" or "O"` });
+      }
+      if (typeof move.position !== 'number' || move.position < 0 || move.position > 8 || !Number.isInteger(move.position)) {
+        return res.status(400).json({ error: `Invalid position at move index ${i}: must be an integer 0-8` });
+      }
+    }
+
     const game = await saveGame(result, moves);
     res.json(game);
   } catch (err) {
