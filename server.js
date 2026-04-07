@@ -5,11 +5,12 @@ const { initDb, saveGame, getGames } = require('./src/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const AI_MOVE_DELAY_MS = parseInt(process.env.AI_MOVE_DELAY_MS, 10) || 1000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/api/ai-move', (req, res) => {
+app.post('/api/ai-move', async (req, res) => {
   try {
     const { board } = req.body;
 
@@ -27,6 +28,11 @@ app.post('/api/ai-move', (req, res) => {
     }
 
     const move = getBestMove(board);
+
+    if (AI_MOVE_DELAY_MS > 0) {
+      await new Promise(resolve => setTimeout(resolve, AI_MOVE_DELAY_MS));
+    }
+
     if (move !== null) {
       res.json({ move });
     } else {
