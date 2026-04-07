@@ -126,17 +126,24 @@ async function loadHistory() {
     const response = await fetch('/api/games');
     const games = await response.json();
 
+    historyDiv.textContent = '';
+
     if (games.length === 0) {
-      historyDiv.innerHTML = '';
       return;
     }
 
-    historyDiv.innerHTML = '<h3>Recent Games</h3>' +
-      games.slice(0, 10).map(g => {
-        const resultText = g.result === 'X' ? 'You won' : g.result === 'O' ? 'AI won' : 'Draw';
-        const date = new Date(g.played_at).toLocaleDateString();
-        return `<div class="history-item">${resultText} - ${date}</div>`;
-      }).join('');
+    const heading = document.createElement('h3');
+    heading.textContent = 'Recent Games';
+    historyDiv.appendChild(heading);
+
+    games.slice(0, 10).forEach(g => {
+      const resultText = g.result === 'X' ? 'You won' : g.result === 'O' ? 'AI won' : 'Draw';
+      const date = new Date(g.played_at).toLocaleDateString();
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.textContent = resultText + ' - ' + date;
+      historyDiv.appendChild(item);
+    });
   } catch (err) {
     console.error('Failed to load history:', err);
   }

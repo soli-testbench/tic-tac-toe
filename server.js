@@ -27,6 +27,10 @@ app.post('/api/ai-move', (req, res) => {
 app.post('/api/games', async (req, res) => {
   try {
     const { result, moves } = req.body;
+    const validResults = ['X', 'O', 'draw'];
+    if (!validResults.includes(result)) {
+      return res.status(400).json({ error: 'Invalid result value' });
+    }
     const game = await saveGame(result, moves);
     res.json(game);
   } catch (err) {
