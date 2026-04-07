@@ -15,6 +15,8 @@ app.post('/api/ai-move', (req, res) => {
     const move = getBestMove(board);
     if (move !== null) {
       res.json({ move });
+    } else {
+      res.json({ move: null });
     }
   } catch (err) {
     console.error('AI move error:', err);
