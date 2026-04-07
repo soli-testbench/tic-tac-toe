@@ -5,6 +5,7 @@ const historyDiv = document.getElementById('history');
 
 let board = Array(9).fill(null);
 let gameOver = false;
+let aiThinking = false;
 let moves = [];
 
 function render() {
@@ -13,7 +14,7 @@ function render() {
     cell.className = 'cell';
     if (board[i] === 'X') cell.classList.add('x');
     if (board[i] === 'O') cell.classList.add('o');
-    if (board[i] || gameOver) cell.classList.add('disabled');
+    if (board[i] || gameOver || aiThinking) cell.classList.add('disabled');
   });
 }
 
@@ -34,6 +35,8 @@ function isBoardFull(b) {
 }
 
 async function makeAiMove() {
+  aiThinking = true;
+  render();
   status.textContent = 'AI is thinking...';
 
   try {
@@ -69,12 +72,13 @@ async function makeAiMove() {
     status.textContent = 'AI error - try again';
   }
 
+  aiThinking = false;
   render();
 }
 
 function handleCellClick(e) {
   const index = parseInt(e.target.dataset.index);
-  if (board[index] || gameOver) return;
+  if (board[index] || gameOver || aiThinking) return;
 
   board[index] = 'X';
   moves.push({ player: 'X', position: index });
@@ -103,6 +107,7 @@ function handleCellClick(e) {
 function resetGame() {
   board = Array(9).fill(null);
   gameOver = false;
+  aiThinking = false;
   moves = [];
   status.textContent = 'Your turn (X)';
   render();

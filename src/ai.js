@@ -10,9 +10,10 @@ function minimax(board, depth, isMaximizing) {
     let bestScore = -Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === null) {
-        board[i] = 'O';
-        const score = minimax(board, depth + 1, false);
-        board[i] = null;
+        // Make move on a copy to avoid mutating the caller's board
+        const newBoard = board.slice();
+        newBoard[i] = 'O';
+        const score = minimax(newBoard, depth + 1, false);
         bestScore = Math.max(score, bestScore);
       }
     }
@@ -21,9 +22,10 @@ function minimax(board, depth, isMaximizing) {
     let bestScore = Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === null) {
-        board[i] = 'X';
-        const score = minimax(board, depth + 1, true);
-        board[i] = null;
+        // Make move on a copy to avoid mutating the caller's board
+        const newBoard = board.slice();
+        newBoard[i] = 'X';
+        const score = minimax(newBoard, depth + 1, true);
         bestScore = Math.min(score, bestScore);
       }
     }
@@ -32,14 +34,16 @@ function minimax(board, depth, isMaximizing) {
 }
 
 function getBestMove(board) {
+  // Work on a copy so the caller's board is never mutated
+  const boardCopy = board.slice();
   let bestScore = -Infinity;
   let bestMove = null;
 
   for (let i = 0; i < 9; i++) {
-    if (board[i] === null) {
-      board[i] = 'O';
-      const score = minimax(board, 0, false);
-      board[i] = null;
+    if (boardCopy[i] === null) {
+      const newBoard = boardCopy.slice();
+      newBoard[i] = 'O';
+      const score = minimax(newBoard, 0, false);
       if (score > bestScore) {
         bestScore = score;
         bestMove = i;
