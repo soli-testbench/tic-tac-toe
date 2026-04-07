@@ -27,6 +27,7 @@ function minimax(board, depth, isMaximizing) {
         bestScore = Math.min(score, bestScore);
       }
     }
+    return bestScore;
   }
 }
 

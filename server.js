@@ -13,8 +13,10 @@ app.post('/api/ai-move', (req, res) => {
   try {
     const { board } = req.body;
     const move = getBestMove(board);
-    if (move !== null) {
+    if (move !== null && move >= 0 && move < 9) {
       res.json({ move });
+    } else {
+      res.status(400).json({ error: 'AI could not determine a valid move' });
     }
   } catch (err) {
     console.error('AI move error:', err);
